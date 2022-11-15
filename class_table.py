@@ -19,7 +19,6 @@ class Table:
     community_cards = []
     player_ids = []
     previous_player_id = 0
-    table_history = []
     table_actions_history = []
     round = 0
 
@@ -138,7 +137,6 @@ class Table:
                 player_id = self.get_next_participant_id()
                 player = self.get_player_by_id(player_id)
 
-                # todo: end iteration function
                 last_remaining = self.check_last_remaining(player)
                 last_to_raise = player.id == self.last_to_raise
                 if last_remaining or (last_to_raise and self.first_pass_players <= 0):
@@ -202,7 +200,6 @@ class Table:
             player_states.append(player_state)
         tablestate = pd.concat([tablestate, pd.concat(player_states)])
         self.table_actions_history.append(tablestate)
-        self.table_history.append(copy(self))
 
 
 
