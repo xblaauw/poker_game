@@ -1,7 +1,6 @@
 import random
 import pandas as pd
-from poker import Card, Hand, Range, Rank, Combo
-from copy import copy, deepcopy
+import treys
 
 
 class Table:
@@ -11,13 +10,13 @@ class Table:
     players = []
     deck = []
     pot = 0
-    effective_stack = None
+    effective_stack = None # effective bet
     action_history = []
     table_history = []
     last_to_raise = None
     iteration = 0
-    community_cards = []
-    player_ids = []
+    community_cards = [] # flop turn river
+    player_ids = [] # 2e id maken voor opslaan van speler profiel
     previous_player_id = 0
     table_actions_history = []
     round = 0

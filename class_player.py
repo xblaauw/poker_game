@@ -3,9 +3,9 @@ import random
 
 class Player:
     hand = []
-    stack = 0
+    stack = 0 # bet
     name = ''
-    bank = 0
+    bank = 0 # stack
     folded = False
 
     def __init__(self, name):
