@@ -1,9 +1,7 @@
 import random
 from treys import Deck, Card, Evaluator, PLOEvaluator
 import pandas as pd
-import numpy as np
-from joblib import Parallel, delayed
-from time import sleep
+
 
 random.seed = 1
 
