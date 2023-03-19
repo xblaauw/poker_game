@@ -7,10 +7,12 @@ from time import sleep
 
 random.seed = 1
 
+
 class Player:
     all_in = False
     folded = False
     eval = Evaluator()
+
     def __init__(self, name):
         self.name = name
 
@@ -77,7 +79,7 @@ class Table:
                     self.bust_players.append(self.players.pop(p.idx))
                     self.reindex_players()
             n_players = len(self.players)
-            if (n_players <= 1) or (i > n_hands):
+            if (n_players <= 1) or (i >= n_hands):
                 break
             else:
                 self.play_hand()
@@ -172,6 +174,10 @@ class Table:
         return unfolded_players_idx
 
     def distribute_pot(self):
+        print('### END OF ROUND, HAND SUMMARY ###')
+        hands = [p.hand for p in table.players]
+        self.eval.hand_summary(self.board, hands)
+
         df = pd.DataFrame(
             data={
                 'names': [p.name for p in self.players],
@@ -190,7 +196,6 @@ class Table:
         for winner_idx in main_pot_winners.index:
             self.players[winner_idx].stack += main_pot / n_main_pot_winners
 
-
         if len(valid_bets) > 1:
             sub_pots = pd.Series(valid_bets, index=valid_bets).diff().dropna()
             for valid_bet, sub_pot_bet in sub_pots.iteritems():
@@ -204,7 +209,9 @@ class Table:
                 sub_pot_winners = sub_pot_participants.loc[sub_pot_participants['scores'] == sub_pot_participants['scores'].min()]
                 n_sub_pot_winners = len(sub_pot_winners)
                 for winner_idx in sub_pot_winners.index:
+                    player_winnings = total_sub_pot / n_sub_pot_winners
                     self.players[winner_idx].stack += total_sub_pot / n_sub_pot_winners
+                    print(f"adding {player_winnings} to player {self.players[winner_idx]}'s stack")
 
     def get_n_active_players(self):
         return len(self.players) - sum([(p.all_in or p.folded) for p in self.players])
@@ -229,7 +236,7 @@ class Table:
                 if any([last_to_raise, all_players_same_bet]):
                     break
 
-            if player.active():
+            if player.active() and not (active_players == 1):
                 options = self.get_player_options(player)
                 action = player.get_action(options, self)
                 transaction = self.do_action(player, action)
@@ -344,12 +351,18 @@ if __name__ == '__main__':
         start_stack=start_stack,
         players=[Player('A'), Player('B'), Player('C'), Player('D')]
     )
-    table.play_multiple_hands(n_hands = 500)
+
+    table.play_multiple_hands(n_hands = 1)
     ah = table.get_action_history()
 
     print('pot', table.pot)
-    print(sum([p.stack for p in table.players]))
-    print([p.bet for p in table.players])
+    print('stacks', [p.stack for p in table.players])
+    print('sum_of_stacks', sum([p.stack for p in table.players]))
+    print('last_bets', [p.bet for p in table.players])
+
+    for player in table.players:
+        print('name', player.name, 'active', player.all_in, 'all_in', player.active(), 'folded', player.folded)
+
     # print(ah.to_string())
     # print(ah['round'].value_counts())
     # print(ah['round'].value_counts()>=4)
